@@ -2,7 +2,12 @@
 // ini_set('display_errors', 'On');
 // error_reporting(E_ALL);
 
-$GLOBALS['player_template_file'] = 'player/player_standalone_minimized.html';
+// $GLOBALS['player_template_file'] = 'player/player_standalone_minimized.html';
+// $GLOBALS['player_template_file'] = 'player/player_standalone.html';
+$GLOBALS['player_template_file_header'] = 'player/player_header.html';
+$GLOBALS['player_template_file_footer'] = 'player/player_footer.html';
+// $GLOBALS['player_template_file_header'] = 'player/player_1';
+// $GLOBALS['player_template_file_footer'] = 'player/player_2';
 $GLOBALS['player_file'] = 'player/my_player.html';
 $GLOBALS['file_directory'] = 'uploads/';
 $GLOBALS['ffmpeg_output_directory'] = 'resample/';
@@ -11,10 +16,10 @@ $GLOBALS['app_name'] = 'Mix2Tape';
 $GLOBALS['allowedFileType'] = array('mp3', 'mp4', 'wav');
 $GLOBALS['count'] = 0;
 $GLOBALS['files'] = array();
-
-$ffmpeg_bin = '/opt/local/bin/ffmpeg';
-$ffmpeg_audio_opt = ' -acodec mp3 -ab 192 ';
-
+$GLOBALS['songs']= array();
+$ffmpeg_bin = 'ffmpeg';
+$ffmpeg_audio_opt = ' -acodec libmp3lame -ab 192 ';
+$ffmpeg_out_arg= ' >/dev/null 2>/dev/null &';
 session_start();
 // if(!isset($_SESSION['n_songs']))
 //     $_SESSION['n_songs'] = 0;
@@ -78,149 +83,75 @@ function removeAudioFile($filepath){
         file_put_contents('php://stderr', $file.name);
     }
 }
-// function writeAllAudioDataInOrder($path, $order, $titles, $authors){
 
-// function writeAllAudioDataInOrder($path, $data){
-//     $order = $data['order'];
-//     $titles = $data['songTitle'];
-//     $authors = $data['songAuthor'];
-//     $save_player_name = $GLOBALS['output_directory'].$data['player_name'].'.html';
-//     file_put_contents('php://stderr', $save_player_name);
 
-//     $audioFiles = glob($path.'*.{'.implode(',', $GLOBALS['allowedFileType']).'}', GLOB_BRACE);
-//     // if($_SESSION['n_songs'] >= 1)
-//         // $player_file_content = file_get_contents($GLOBALS['player_file']);
-//     // else
-//     $player_file_content = file_get_contents($GLOBALS['player_template_file']);
-//     file_put_contents('php://stderr', $path.'*.{'.implode(',', $GLOBALS['allowedFileType']).'}');  
-//     // file_put_contents('php://stderr', print_r($path, TRUE));
-//     file_put_contents('php://stderr', print_r($audioFiles, TRUE));
 
-//     $doc = new DOMDocument();
-//     $doc->formatOutput = true;
-//     $doc->loadHTML($player_file_content);
-//     $playlist = $doc->getElementById('playlist');
-            
-//     // foreach($audioFiles as $file){
-//     foreach($order as $index){
-//         $file = $audioFiles[$index];
-//         $title = $titles[$index];
-//         file_put_contents('php://stderr', print_r($title, TRUE));
-        
-//         $byte_array = file_get_contents($file);
-//         $audio = base64_encode($byte_array);
-            
-//         // echo '<pre>';
-//         // print_r($playlist);
-//         // echo '</pre>';
-//         // file_put_contents('php://stderr', print_r($playlist, TRUE));
-//         // file_put_contents('php://stderr', print_r($_SESSION['n_songs'], TRUE));
-
-//         // $filename = pathinfo($file, PATHINFO_FILENAME);  
-//         // $element = $doc->createElement('li', $filename);
-//         $filename = pathinfo($title, PATHINFO_FILENAME);
-//         $element = $doc -> createElement('li', $filename);
-
-//         file_put_contents('php://stderr', print_r($title, TRUE));
-//         // file_put_contents('php://stderr', print_r($element, TRUE));
-//         // echo '<pre>';
-//         // print_r($element);
-//         // echo '</pre>';
-//         $extension = pathinfo($file, PATHINFO_EXTENSION);
-//         $audio_url = "data:audio/".$extension.";base64,".$audio;
-//         $element->setAttribute('audiourl', $audio_url);
-      
-//         $artist = $authors[$index];
-//         $element->setAttribute('artist', $artist);
-     
-//         $playlist->appendChild($element);
-
-//     }
-//     file_put_contents('php://stderr', print_r($playlist, TRUE));
-        
-
-//     // $doc->save($GLOBALS['player_file'], LIBXML_NOEMPTYTAG);
-//     $doc->save($save_player_name, LIBXML_NOEMPTYTAG);
-//     file_put_contents('php://stderr', "done!");
-//     downloadFile($save_player_name);
-// }
-
-function writeAllAudioDataInOrderViaForm($path, $data){
+function writeAllAudioDataInOrderSecondAttempt($path, $data){
     $order = json_decode($data['order']);
     $titles = json_decode($data['songTitle']);
     $authors = json_decode($data['songAuthor']);
+    $fileUploadOrder= json_decode($data['fileUploadOrder']);
     $save_player_name = $GLOBALS['output_directory'].$data['player_name'].'.html';
     // file_put_contents('php://stderr', $save_player_name);
 
     $audioFiles = glob($path.'*.{'.implode(',', $GLOBALS['allowedFileType']).'}', GLOB_BRACE|GLOB_NOSORT);
     usort($audioFiles, create_function('$a,$b', 'return filemtime($a) - filemtime($b);'));
-    file_put_contents('php://stderr', print_r($audioFiles, TRUE));
-    // file_put_contents('php://stderr', var_dump($GLOBALS['files'], TRUE));
-    // if($_SESSION['n_songs'] >= 1)
-        // $player_file_content = file_get_contents($GLOBALS['player_file']);
-    // else
-    $player_file_content = file_get_contents($GLOBALS['player_template_file']);
-    file_put_contents('php://stderr', $path.'*.{'.implode(',', $GLOBALS['allowedFileType']).'}');  
-    // file_put_contents('php://stderr', print_r($path, TRUE));
     // file_put_contents('php://stderr', print_r($audioFiles, TRUE));
+    // file_put_contents('php://stderr', 'Audio Files Ordering: '.var_dump($GLOBALS['files'], TRUE));
+    
 
-    $doc = new DOMDocument();
-    $doc->formatOutput = true;
-    $doc->loadHTML($player_file_content);
-    $playlist = $doc->getElementById('playlist');
-            
-    // foreach($audioFiles as $file){
-    // $ind = 0;
-    // foreach($GLOBALS['files'] as $index => $f){
+    $player_file_header = file_get_contents($GLOBALS['player_template_file_header']);
+    // $player_file_content = file_get_contents($GLOBALS['player_template_file']);
+    file_put_contents('php://stderr', $path.'*.{'.implode(',', $GLOBALS['allowedFileType']).'}');  
+    file_put_contents($save_player_name, $player_file_header, LOCK_EX);
+   
+    // 
     foreach($order as $index => $value){
         file_put_contents('php://stderr', print_r($value, TRUE));
         // $file = $path.$f;
-        $file = $audioFiles[$value];
+        // $file = $path.$GLOBALS['songs'][$value];
+        // $file = $path.$songArray[$value];
+        $file = $path.$fileUploadOrder[$value];
+        file_put_contents('php://stderr', print_r($file, TRUE));
+        // $file = $audioFiles[$value];
         $title = $titles[$index];
         file_put_contents('php://stderr', print_r($file, TRUE));
         
         $byte_array = file_get_contents($file);
         $audio = base64_encode($byte_array);
             
-        // echo '<pre>';
-        // print_r($playlist);
-        // echo '</pre>';
-        // file_put_contents('php://stderr', print_r($playlist, TRUE));
-        // file_put_contents('php://stderr', print_r($_SESSION['n_songs'], TRUE));
-
-        // $filename = pathinfo($file, PATHINFO_FILENAME);  
-        // $element = $doc->createElement('li', $filename);
+       
         $filename = pathinfo($title, PATHINFO_FILENAME);
-        $element = $doc -> createElement('li', $filename);
+       
 
         file_put_contents('php://stderr', print_r($title, TRUE));
-        // file_put_contents('php://stderr', print_r($element, TRUE));
-        // echo '<pre>';
-        // print_r($element);
-        // echo '</pre>';
+      
         $extension = pathinfo($file, PATHINFO_EXTENSION);
         $audio_url = "data:audio/".$extension.";base64,".$audio;
-        $element->setAttribute('audiourl', $audio_url);
-      
+        // $element->setAttribute('audiourl', $audio_url);
+        
         $artist = $authors[$index];
-        $element->setAttribute('artist', $artist);
+        // $element->setAttribute('artist', $artist);
      
-        $playlist->appendChild($element);
-        // unlink($file);
+        // $playlist->appendChild($element);
+        unlink($file);
+        
+        $element = '<li artist="'.$artist.'" audiourl="'.$audio_url.'">'.$filename.'</li>';
+        file_put_contents($save_player_name, $element, FILE_APPEND | LOCK_EX);
 
     }
-    file_put_contents('php://stderr', print_r($playlist, TRUE));
-        
+    // file_put_contents('php://stderr', print_r($playlist, TRUE));
+    
+    $player_file_footer = file_get_contents($GLOBALS['player_template_file_footer']);
+    file_put_contents($save_player_name, $player_file_footer, FILE_APPEND | LOCK_EX);
 
-    // $doc->saveHTMLFile($save_player_name);
-    // $doc->save($save_player_name, LIBXML_NOEMPTYTAG);
-    $string = $doc->saveXML($doc->documentElement, LIBXML_NOEMPTYTAG);
-    $removed = str_replace("<![CDATA[", "", $string);
-    $removed = str_replace("]]>", "", $removed);
-    file_put_contents($save_player_name, $removed);
+ 
     file_put_contents('php://stderr', "done!");
-    downloadFile($save_player_name);
+    // downloadFile($save_player_name);
+    return $save_player_name;
 }
+
+
 function downloadFile($filepath){
 
     if (file_exists($filepath)) {
@@ -235,15 +166,17 @@ function downloadFile($filepath){
         flush();
         readfile($filepath);
         file_put_contents('php://stderr', "sent!");
-        unlink($filepath);
+        // unlink($filepath);
 
         // removeAudioFile($GLOBALS['ffmpeg_output_directory']);
         // removeAudioFile($GLOBALS['file_directory']);
+        // $link = "http://$_SERVER[HTTP_HOST]/$GLOBALS[app_name]/$filepath";
+        // echo '{"download_url": "'.$link.'"}';
         exit;
     }
-    // $link = "http://$_SERVER[HTTP_HOST]/$GLOBALS[app_name]/$filepath";
+    
     // pathinfo($_FILES['upl']['name'], PATHINFO_FILENAME); 
-    // echo '{"download_url": "'.$link.'"}';
+    
 }
 // A list of permitted file extensions
 // echo 'hello!';
@@ -272,12 +205,26 @@ if(isset($_FILES['upl']) && $_FILES['upl']['error'] == 0){
 // 
         // $GLOBALS['count']++;
 
-        $GLOBALS['songs'][$_POST['songID']] = $_FILES['upl']['name'];
+        // $songArray[$_POST['songID']] = $_FILES['upl']['name'];
+        // global $songArray = $GLOBALS['songs'];
+        global $songArray;
+        $songArray[$_POST['songID']] = $_FILES['upl']['name'];
+        file_put_contents('php://stderr', 'song array now!!!');
+        foreach($songArray as $index => $song){
+            file_put_contents('php://stderr', '======'.print_r($index, TRUE).':'.print_r($song, TRUE).'========');
+        }
+        $GLOBALS['songs'] = $songArray;
+        // $GLOBALS['songs'][$_POST['songID']] = $_FILES['upl']['name'];
+        // file_put_contents('php://stderr', '///////////'.print_r($GLOBALS['songs'][$_POST['songID']], TRUE).'////////////');
+        // foreach($GLOBALS['songs'] as $index => $song){
+        //     file_put_contents('php://stderr', '======'.print_r($index, TRUE).':'.print_r($song, TRUE).'========');
+        // }
+        // file_put_contents('php://stderr', 'SongID:'.print_r($_POST['songID'], TRUE).'\n');
         // echo 'moved!';
         
         $file_i = $GLOBALS['file_directory'].$_FILES['upl']['name'];
         $file_o = $GLOBALS['ffmpeg_output_directory'].$_FILES['upl']['name'];
-        $cmd = $ffmpeg_bin . ' -i ' . escapeshellarg($file_i) . $ffmpeg_audio_opt . escapeshellarg($file_o);
+        $cmd = $ffmpeg_bin . ' -i ' . escapeshellarg($file_i) . $ffmpeg_audio_opt . escapeshellarg($file_o). $ffmpeg_out_arg;
         // $cmd = "/usr/bin/ffmpeg -i $uploadFile -f flv -acodec mp3 -ab 64 -ac 1 -title \"Clip Title\" -author \"Clip Author\" -copyright \"Clip Copyright\" $finalFile";
         exec( $cmd );
         // file_put_contents('php://stderr', print_r($cmd, TRUE));
@@ -304,8 +251,22 @@ if(isset($_POST['action'])){
     //     writeAllAudioDataInOrder($GLOBALS['ffmpeg_output_directory'], $_POST);
     // }
     if($_POST['action'] == 'WriteFileViaForm'){
-        writeAllAudioDataInOrderViaForm($GLOBALS['ffmpeg_output_directory'], $_POST);
-        
+        // writeAllAudioDataInOrderViaForm($GLOBALS['ffmpeg_output_directory'], $_POST);
+        // writeAllAudioDataInOrderViaForm($GLOBALS['file_directory'], $_POST);
+        // $save_player_name= writeAllAudioDataInOrderSecondAttempt($GLOBALS['file_directory'], $_POST);
+        $save_player_name= writeAllAudioDataInOrderSecondAttempt($GLOBALS['ffmpeg_output_directory'], $_POST);
+        downloadFile($save_player_name);
+        file_put_contents('php://stderr', 'DONWLOAD!!!');
+    }
+    else{
+        file_put_contents('php://stderr', 'RETURN link!!!');
+        // $save_player_name= writeAllAudioDataInOrderSecondAttempt($GLOBALS['file_directory'], $_POST);
+
+        $save_player_name= writeAllAudioDataInOrderSecondAttempt($GLOBALS['ffmpeg_output_directory'], $_POST);
+        $link = "http://$_SERVER[HTTP_HOST]/$GLOBALS[app_name]/".$save_player_name;
+    // pathinfo($_FILES['upl']['name'], PATHINFO_FILENAME);
+        echo '{"download_url": "'.$link.'"}';
+        // echo '{"status":"success"}';
     }
 }
 

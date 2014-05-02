@@ -150,7 +150,18 @@ jQuery(document).ready(function() {
     $('.pl').click(function (e) {
         e.preventDefault();
 
-        $('.playlist').fadeIn(300);
+       
+        if($('.playlist').hasClass('hidden')){
+             $('.playlist').fadeIn(300);
+             $('.playlist').removeClass('hidden');
+             $('.playlist').addClass('visible');
+        }
+        else{
+            $('.playlist').fadeOut(300);
+             $('.playlist').removeClass('visible');
+             $('.playlist').addClass('hidden');   
+        }
+            
     });
 
     // playlist elements - click
