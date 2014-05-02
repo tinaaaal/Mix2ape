@@ -6,14 +6,17 @@
 		<title>Mini Ajax File Upload Form</title>
 
 		<!-- JavaScript Includes -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+		<!-- // <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
+		<!-- // <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script> -->
+		<script src="assets/js/jquery-1.10.2.js"></script>
+		<script src="assets/js/jquery-ui-1.10.4.js"></script>
 		<script src="assets/js/jquery.knob.js"></script>
-
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+  
 		<!-- Bootstrap -->
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-		<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-
+		<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+		<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+		<!-- // <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script> -->
 		<!-- jQuery File Upload Dependencies -->
 		<script src="assets/js/jquery.ui.widget.js"></script>
 		<script src="assets/js/jquery.iframe-transport.js"></script>
@@ -38,8 +41,10 @@
 		
 		<!-- <link href="assets/jquery-ui-1.10.1.custom/css/redmond/jquery-ui-1.10.1.custom.css" rel="stylesheet"> -->
 		<!-- // <script src="assets/jquery-ui-1.10.1.custom/js/jquery-ui-1.10.1.custom.min.js"></script> -->
-		<link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jqueryui-editable/css/jqueryui-editable.css" rel="stylesheet"/>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jqueryui-editable/js/jqueryui-editable.min.js"></script>
+
+		<!-- jQuery Editable -->
+		<link href="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jqueryui-editable/css/jqueryui-editable.css" rel="stylesheet"/>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jqueryui-editable/js/jqueryui-editable.min.js"></script>
 		
 		<!-- The main CSS file -->
 		<link href="assets/css/style.css" rel="stylesheet" />
@@ -49,9 +54,27 @@
 
 	<body>
 		<form id="upload" method="post" action="upload.php" enctype="multipart/form-data">
-			<div class="duration_info">
+			<div class="">
+
+				<label>Total Size:</label>
+				<label id="current_total_size"> 0 MB</label>
+				<!-- <div class= "align-right"> -->
+				<span class= "align-right">
 				<label>Total Duration:</label>
 				<label id="current_total_duration" >0:00</label>
+			</span>
+				<!-- </div> -->
+			<!-- </div> -->
+			<div class="duration_info">
+				<label >Estimated Total Size:</label>
+				<label id="current_compressed_size" >0 MB</label>
+				
+				<!-- <div class= "align-right"> -->
+				<span style="margin-left:25px">
+				<label>Available Time Left:</label>
+				<label id="current_time_available" > 45:00</label>
+				</span>
+				</div>
 			</div>
 			<div id="drop">
 				Drop Here
@@ -80,13 +103,18 @@
 			<!-- </div> -->
 			<!-- <div class = "row"> -->
 				<!-- <div> -->
-				<button type = "button" class = "btn btn-default" id = "finish" name = "Done" onclick = "handleFileUploads()" > CREATE PLAYLIST </button>
+				<button type = "button" class = "btn btn-default finish" id = "finish_download" name = "Done" > DOWNLOAD </button>
+				<button type = "button" class = "btn btn-default finish" id = "finish_getlink" name = "Done" onclick = "getDownloadURL()" > GET LINK </button>
 				<!-- </div> -->
+				<a id="download_link" download></a>
 			<!-- </div> -->
 		</form>
         <!-- </div> -->
-		<a id="download_link"></a>
+		
 
-
+        <div id="alert-dialog" title="Excceeds Maximum Length">
+  		<p> The current playlist has exceeded the maximum length. Please remove some songs.
+  		</p>
+		</div>
 	</body>
 </html>

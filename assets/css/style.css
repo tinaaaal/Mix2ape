@@ -12,7 +12,9 @@
 /*-------------------------
     General Styles
 --------------------------*/
-
+.div{
+    display: inline;
+}
 
 html{
     /*background-color:#ebebec;
@@ -113,8 +115,16 @@ section, footer, header, aside{
     color:#7f858a;
 }
 #upload .duration_info{
-    margin-left: 220px;
+    /*margin-left: 220px;*/
 }
+#upload .size_info{
+    /*margin-left: 220px;*/
+}
+
+.align-right{
+    margin-left:100px;
+}
+
 #upload ul{
     list-style:none;
     margin:0 -30px;
@@ -133,7 +143,7 @@ section, footer, header, aside{
     border-top:1px solid #3d4043;
     border-bottom:1px solid #2b2e31;
     padding:15px;
-    height: 52px;
+    height: 120px;
 
     position: relative;
 }
@@ -200,6 +210,16 @@ section, footer, header, aside{
     cursor:pointer;
 }
 
+.delete{
+    width: 15px;
+    background: url('../img/icons.png') no-repeat;
+    position: absolute;
+    height: 16px;
+    background-position: 0 -12px;
+    top: 34px;
+    right: 33px;
+    cursor:pointer;
+}
 
 
 #upload ul li.working span{
@@ -219,7 +239,7 @@ section, footer, header, aside{
     /*display: block;*/
 }
 
-#finish{
+.finish{
     font-family:'PT Sans Narrow', sans-serif;
     background-color:#007a96;
     /*padding:12px 26px;*/
@@ -238,6 +258,31 @@ section, footer, header, aside{
     border-radius:3px;
     padding-left: 50px;
     margin:auto auto 0px;
+}
+
+#alert-dialog{
+
+}
+
+.ui-widget-content{
+    background: #373a3d;
+    font-family: 'PT Sans Narrow', sans-serif;
+    color:white;
+    border: transparent;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.ui-widget-header {
+    background:#dd0055;
+    color:white;
+    border: transparent;
+}
+
+.ui-dialog .ui-dialog-titlebar-close{
+    background-image: url(../img/ui-icons_888888_256x240.png);
+    background-position: -96px -128px;
+    border: 1px solid transparent;
+    border-radius: 4px; */
 }
 /*----------------------------
     The Demo Footer
