@@ -18,7 +18,7 @@ $GLOBALS['count'] = 0;
 $GLOBALS['files'] = array();
 $GLOBALS['songs']= array();
 $ffmpeg_bin = 'ffmpeg';
-$ffmpeg_audio_opt = ' -acodec libmp3lame -ab 192 ';
+$ffmpeg_audio_opt = ' -acodec libmp3lame -ab 96 ';
 $ffmpeg_out_arg= ' >/dev/null 2>/dev/null &';
 session_start();
 // if(!isset($_SESSION['n_songs']))

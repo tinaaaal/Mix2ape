@@ -54,7 +54,7 @@ $(function(){
     var totalCompressedSize = 0;
 
     var SAMP_RATE = 96*1024;
-    var TIME_ALLOWED = 10*60;
+    var TIME_ALLOWED = 45*60;
     $("#sortable").sortable({axis: "y"});
     $('#alert-dialog').dialog({
         autoOpen: false,
@@ -74,6 +74,62 @@ $(function(){
 
         }
        
+    });
+
+    $('#finish_getlink').on("click", function(){
+        var sortedOrder = $('#sortable').sortable('toArray');
+        var songTitles = $('.songTitle').map(function() {
+                            return $(this).text();
+                            }).get();
+        var songAuthors = $('.songAuthor').map(function() {
+                            return $(this).text();
+                            }).get();
+        
+        var player_name = $('#playlist_name').val();
+        var fileData = {
+            'action': 'WriteFile',
+            'order': JSON.stringify(sortedOrder),
+            'songTitle': JSON.stringify(songTitles),
+            'songAuthor': JSON.stringify(songAuthors),
+            'player_name': player_name,
+            'fileUploadOrder': JSON.stringify(fileUploadOrder)
+        }; //should be the metadata of the files
+        // console.log(sortedOrder);
+
+        var request;
+        request = $.ajax({
+            url:"upload.php",
+            type: "post",
+            data: fileData,
+            datatype: 'json',
+            success: function (data, text) {
+                console.log(data);
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+
+        request.done(function(response, textStatus, jqXHR){
+            //prepare to allow user to download the file
+            console.log('request successfully sent!');
+            console.log(response);
+            var json = JSON.parse(response);
+
+            var a = $('#download_link');
+            // a.attr('href', json['download_url']);
+            a.text(json['download_url']);
+            a.fadeIn();
+            a.click(function(){
+                // document.location = json['download_url'];
+                window.prompt("Copy to clipboard: Ctrl+C, Enter", a.text());
+            });
+            
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown){
+            console.log('request failed');
+        });
     });
 
 
@@ -315,62 +371,8 @@ $(function(){
 
         return minute*60+sec;
     };
-
-    function getDownloadURL(){
-    var sortedOrder = $('#sortable').sortable('toArray');
-    var songTitles = $('.songTitle').map(function() {
-                        return $(this).text();
-                        }).get();
-    var songAuthors = $('.songAuthor').map(function() {
-                        return $(this).text();
-                        }).get();
     
-    var player_name = $('#playlist_name').val();
-    var fileData = {
-        'action': 'WriteFile',
-        'order': JSON.stringify(sortedOrder),
-        'songTitle': JSON.stringify(songTitles),
-        'songAuthor': JSON.stringify(songAuthors),
-        'player_name': player_name,
-        'fileUploadOrder': JSON.stringify(fileUploadOrder)
-    }; //should be the metadata of the files
-    // console.log(sortedOrder);
-
-    var request;
-    request = $.ajax({
-        url:"upload.php",
-        type: "post",
-        data: fileData,
-        datatype: 'json',
-        success: function (data, text) {
-            console.log(data);
-        },
-        error: function (request, status, error) {
-            alert(request.responseText);
-        }
-    });
-
-    request.done(function(response, textStatus, jqXHR){
-        //prepare to allow user to download the file
-        console.log('request successfully sent!');
-        console.log(response);
-        var json = JSON.parse(response);
-
-        var a = $('#download_link');
-        // a.attr('href', json['download_url']);
-        a.text(json['download_url']);
-        a.fadeIn();
-        a.click(function(){
-            // document.location = json['download_url'];
-            window.prompt("Copy to clipboard: Ctrl+C, Enter", a.text());
-        });
-        
-    });
-
-    request.fail(function (jqXHR, textStatus, errorThrown){
-        console.log('request failed');
-    });
-};
+   
 
 function createForm(){
     var sortedOrder = $('#sortable').sortable('toArray');
@@ -425,6 +427,61 @@ function createForm(){
     console.log(form);
     return form;   
 };
+ // function getDownloadURL(){
+ //        var sortedOrder = $('#sortable').sortable('toArray');
+ //        var songTitles = $('.songTitle').map(function() {
+ //                            return $(this).text();
+ //                            }).get();
+ //        var songAuthors = $('.songAuthor').map(function() {
+ //                            return $(this).text();
+ //                            }).get();
+        
+ //        var player_name = $('#playlist_name').val();
+ //        var fileData = {
+ //            'action': 'WriteFile',
+ //            'order': JSON.stringify(sortedOrder),
+ //            'songTitle': JSON.stringify(songTitles),
+ //            'songAuthor': JSON.stringify(songAuthors),
+ //            'player_name': player_name,
+ //            'fileUploadOrder': JSON.stringify(fileUploadOrder)
+ //        }; //should be the metadata of the files
+ //        // console.log(sortedOrder);
+
+ //        var request;
+ //        request = $.ajax({
+ //            url:"upload.php",
+ //            type: "post",
+ //            data: fileData,
+ //            datatype: 'json',
+ //            success: function (data, text) {
+ //                console.log(data);
+ //            },
+ //            error: function (request, status, error) {
+ //                alert(request.responseText);
+ //            }
+ //        });
+
+ //        request.done(function(response, textStatus, jqXHR){
+ //            //prepare to allow user to download the file
+ //            console.log('request successfully sent!');
+ //            console.log(response);
+ //            var json = JSON.parse(response);
+
+ //            var a = $('#download_link');
+ //            // a.attr('href', json['download_url']);
+ //            a.text(json['download_url']);
+ //            a.fadeIn();
+ //            a.click(function(){
+ //                // document.location = json['download_url'];
+ //                window.prompt("Copy to clipboard: Ctrl+C, Enter", a.text());
+ //            });
+            
+ //        });
+
+ //        request.fail(function (jqXHR, textStatus, errorThrown){
+ //            console.log('request failed');
+ //        });
+ //    };
 
 function handleFileUploads(){
     if(totalDuration > TIME_ALLOWED)
